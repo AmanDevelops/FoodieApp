@@ -1,20 +1,11 @@
-import { withSuperAuth, hasPermission } from '../../../lib/superauth';
+import { withAuth } from '../../../lib/superauth';
 
-// Mock cart storage (in production, use database)
+// Simple in-memory cart storage (resets on server restart)
 const userCarts = new Map();
 
 async function handler(req, res) {
   const { method } = req;
   const { user } = req;
-
-  // Check if user has permission to manage cart
-  if (!hasPermission(user, 'cart:manage')) {
-    return res.status(403).json({
-      error: 'Insufficient permissions',
-      message: 'User does not have permission to manage cart'
-    });
-  }
-
   const cartKey = `cart_${user.id}`;
 
   switch (method) {
@@ -31,18 +22,14 @@ async function handler(req, res) {
             summary: {
               total_items: totalItems,
               total_price: totalPrice,
-              subtotal: totalPrice,
               delivery_fee: 60,
               tax: totalPrice * 0.05,
               grand_total: totalPrice + 60 + (totalPrice * 0.05)
             },
-            user_context: {
-              user_id: user.id
-            }
+            user_id: user.id
           }
         });
       } catch (error) {
-        console.error('Cart fetch error:', error);
         res.status(500).json({
           error: 'Internal server error',
           message: 'Failed to fetch cart'
@@ -65,10 +52,8 @@ async function handler(req, res) {
         const existingItemIndex = cart.findIndex(item => item.id === item_id);
 
         if (existingItemIndex >= 0) {
-          // Update existing item quantity
           cart[existingItemIndex].quantity += quantity;
         } else {
-          // Add new item to cart
           cart.push({
             id: item_id,
             name: item_details.name,
@@ -91,7 +76,6 @@ async function handler(req, res) {
           }
         });
       } catch (error) {
-        console.error('Add to cart error:', error);
         res.status(500).json({
           error: 'Internal server error',
           message: 'Failed to add item to cart'
@@ -121,10 +105,8 @@ async function handler(req, res) {
         }
 
         if (quantity <= 0) {
-          // Remove item if quantity is 0 or negative
           cart.splice(itemIndex, 1);
         } else {
-          // Update quantity
           cart[itemIndex].quantity = quantity;
         }
 
@@ -132,14 +114,9 @@ async function handler(req, res) {
 
         res.status(200).json({
           success: true,
-          message: 'Cart updated successfully',
-          data: {
-            cart_items: cart.length,
-            total_quantity: cart.reduce((sum, item) => sum + item.quantity, 0)
-          }
+          message: 'Cart updated successfully'
         });
       } catch (error) {
-        console.error('Update cart error:', error);
         res.status(500).json({
           error: 'Internal server error',
           message: 'Failed to update cart'
@@ -152,12 +129,10 @@ async function handler(req, res) {
         const { item_id } = req.query;
 
         if (item_id) {
-          // Remove specific item
           let cart = userCarts.get(cartKey) || [];
           cart = cart.filter(item => item.id !== parseInt(item_id));
           userCarts.set(cartKey, cart);
         } else {
-          // Clear entire cart
           userCarts.set(cartKey, []);
         }
 
@@ -166,7 +141,6 @@ async function handler(req, res) {
           message: item_id ? 'Item removed from cart' : 'Cart cleared successfully'
         });
       } catch (error) {
-        console.error('Remove from cart error:', error);
         res.status(500).json({
           error: 'Internal server error',
           message: 'Failed to remove item from cart'
@@ -184,4 +158,4 @@ async function handler(req, res) {
   }
 }
 
-export default withSuperAuth(handler);
+export default withAuth(handler);

@@ -1,8 +1,6 @@
 /**
- * Health check endpoint for the Super App
- * This endpoint doesn't require authentication
+ * Health check endpoint - no authentication required
  */
-
 export default function handler(req, res) {
   const { method } = req;
 
@@ -16,14 +14,13 @@ export default function handler(req, res) {
 
   res.status(200).json({
     success: true,
-    message: 'FoodieApp Super App is running',
+    message: 'FoodieApp is running',
     data: {
       app_name: 'foodie-app',
       version: '1.0.0',
       status: 'healthy',
       timestamp: new Date().toISOString(),
-      super_auth_enabled: true,
-      supported_endpoints: [
+      endpoints: [
         'GET /api/[user_auth_token]/menu',
         'GET /api/[user_auth_token]/cart',
         'POST /api/[user_auth_token]/cart',
@@ -31,8 +28,6 @@ export default function handler(req, res) {
         'DELETE /api/[user_auth_token]/cart',
         'GET /api/[user_auth_token]/orders',
         'POST /api/[user_auth_token]/orders',
-        'GET /api/[user_auth_token]/orders/[order_id]',
-        'PUT /api/[user_auth_token]/orders/[order_id]',
         'GET /api/[user_auth_token]/profile'
       ]
     }

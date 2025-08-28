@@ -1,4 +1,4 @@
-import { withSuperAuth, getUserAppData } from '../../../lib/superauth';
+import { withAuth } from '../../../lib/superauth';
 
 async function handler(req, res) {
   const { method } = req;
@@ -7,8 +7,6 @@ async function handler(req, res) {
   switch (method) {
     case 'GET':
       try {
-        const appData = getUserAppData(user);
-        
         res.status(200).json({
           success: true,
           data: {
@@ -16,18 +14,15 @@ async function handler(req, res) {
               id: user.id,
               name: user.name,
               email: user.email,
-              permissions: user.permissions,
-              app_context: user.app_context
+              token: user.token
             },
-            app_data: appData,
-            token_info: {
-              expires_at: user.token_expires_at,
-              scoped_permissions: user.permissions
+            app_info: {
+              name: 'FoodieApp',
+              version: '1.0.0'
             }
           }
         });
       } catch (error) {
-        console.error('Profile fetch error:', error);
         res.status(500).json({
           error: 'Internal server error',
           message: 'Failed to fetch user profile'
@@ -45,4 +40,4 @@ async function handler(req, res) {
   }
 }
 
-export default withSuperAuth(handler);
+export default withAuth(handler);
