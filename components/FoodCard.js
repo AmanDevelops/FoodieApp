@@ -33,7 +33,6 @@ const FoodCard = ({ item, showAddButton = true }) => {
         <div className={styles.imageContainer}>
           <img src={item.image} alt={item.name} className={styles.image} />
           {item.featured && <div className={styles.featuredBadge}>Featured</div>}
-          }
         </div>
         <div className={styles.content}>
           <h3 className={styles.name}>{item.name}</h3>
