@@ -6,7 +6,7 @@ import styles from "../styles/Layout.module.css";
 
 const Layout = ({ children }) => {
   const router = useRouter();
-  const { getTotalItems } = useAppContext();
+  const { getTotalItems, loading } = useAppContext();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigation = [
@@ -14,6 +14,17 @@ const Layout = ({ children }) => {
     { name: "Food Items", href: "/food-items" },
     { name: "Cart", href: "/cart" },
   ];
+
+  if (loading) {
+    return (
+      <div className={styles.layout}>
+        <div className={styles.loadingContainer}>
+          <div className="loading"></div>
+          <p>Loading FoodieApp...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.layout}>

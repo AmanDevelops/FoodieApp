@@ -32,17 +32,19 @@ export default function FoodItemDetail() {
 
   const handleAddToCart = async () => {
     setIsAdding(true);
-    addToCart(item, quantity);
     
-    // Simulate loading state
-    setTimeout(() => {
+    try {
+      await addToCart(item, quantity);
       setIsAdding(false);
       // Show success and redirect to cart or show confirmation
       const goToCart = confirm('Item added to cart! Go to cart now?');
       if (goToCart) {
         router.push('/cart');
       }
-    }, 500);
+    } catch (error) {
+      setIsAdding(false);
+      alert('Failed to add item to cart. Please try again.');
+    }
   };
 
   const relatedItems = foodItems

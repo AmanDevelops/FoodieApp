@@ -5,21 +5,26 @@ import styles from '../styles/FoodCard.module.css';
 const FoodCard = ({ item, showAddButton = true }) => {
   const { addToCart } = useAppContext();
 
-  const handleAddToCart = (e) => {
+  const handleAddToCart = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    addToCart(item, 1);
     
-    // Show a brief success message
-    const button = e.target;
-    const originalText = button.textContent;
-    button.textContent = 'Added!';
-    button.style.backgroundColor = 'var(--success-color)';
-    
-    setTimeout(() => {
-      button.textContent = originalText;
-      button.style.backgroundColor = '';
-    }, 1000);
+    try {
+      await addToCart(item, 1);
+      
+      // Show a brief success message
+      const button = e.target;
+      const originalText = button.textContent;
+      button.textContent = 'Added!';
+      button.style.backgroundColor = 'var(--success-color)';
+      
+      setTimeout(() => {
+        button.textContent = originalText;
+        button.style.backgroundColor = '';
+      }, 1000);
+    } catch (error) {
+      alert('Failed to add item to cart');
+    }
   };
 
   return (

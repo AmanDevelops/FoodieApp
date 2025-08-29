@@ -37,20 +37,24 @@ export default function Checkout() {
 
     setIsProcessing(true);
 
-    // Update user with selected address
     const selectedAddressData = deliveryAddresses.find(
       (addr) => addr.id === selectedAddress
     );
-    setUser((prev) => ({ ...prev, selectedAddress: selectedAddressData }));
 
-    // Simulate order processing
-    setTimeout(() => {
-      const order = placeOrder();
+    try {
+      // Update user with selected address
+      setUser((prev) => ({ ...prev, selectedAddress: selectedAddressData }));
+      
+      const order = await placeOrder(selectedAddressData);
       setIsProcessing(false);
 
       // Redirect to success page with order details
       router.push(`/checkout/success?orderId=${order.id}`);
-    }, 2000);
+    } catch (error) {
+      setIsProcessing(false);
+      alert('Failed to place order. Please try again.');
+      console.error('Order placement failed:', error);
+    }
   };
 
   if (cart.length === 0) {
